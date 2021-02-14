@@ -32,3 +32,21 @@ main {
 p {
     text-align: center;
 }
+
+button {
+    border: none;
+}
+
+.start-button {
+    border: 1px solid #000000;
+    padding: 15px 25px;
+    background-color: purple;
+    color: #fff;
+    font-weight: bolder;
+    font-size: large;
+    border-radius: 75%;
+}
+
+.start-button:hover {
+    background-color: rgb(19, 19, 124);
+}

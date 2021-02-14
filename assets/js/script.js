@@ -1,10 +1,15 @@
 // Timer setup
-var startButton = document.querySelector(".start-button");
+var startButton = document.querySelector("#start-button");
 
-var timeLeft = document.querySelector(".timer-count");
+var timeLeft = document.querySelector("#timer-count");
+
+var content = document.getElementById("content");
 
 // Starting time for quiz
-var secondsLeft = 75;
+var secondsLeft = 60;
+
+var questionCounter = 0;
+
 
 // Timer functionality
 function setTime() {
@@ -16,15 +21,65 @@ function setTime() {
         timeLeft.textContent = secondsLeft;
 
         // Stop timer when reach zero
-        if (secondsLeft === 0) {
+        if (secondsLeft <= 0) {
             clearInterval(timerInterval);
+            timeLeft.textContent = 0;
         }
     }, 1000);
     
 };
 
+// function to generate HTML for the questions
+function quizQs(questionObject) {
+
+    console.log(questionObject);
+
+    var question = document.createElement("h1");
+
+    question.textContent = questionObject.question;
+
+    content.appendChild(question);
+
+    var answers = Object.entries(questionObject.answers);
+
+    console.log(answers);
+
+    for (var i=0; i < answers.length; i++) {
+        var answer = answers[i];
+        // answer = ["1", "answer text"]
+        var button = document.createElement("button");
+        button.textContent = answer[0] + ". " + answer[1];
+        button.setAttribute("value", answer[0]);
+        button.setAttribute("id", "answerBtn");
+        button.addEventListener("click", function (event) {
+            answerSelect(event, questionObject.correctAnswer)
+        });
+        content.appendChild(button);
+    }
+
+}
+
+// what happens when user selects an answer
+function answerSelect(event, correctAnswer) {
+    console.log(event.target.value);
+    console.log(correctAnswer);
+}
+
+
+function startQuiz() {
+
+    setTime();
+
+    console.log(content);
+
+    content.innerHTML = "";
+
+    quizQs(quizQuestions[questionCounter]);
+
+}
+
 // When start clicked, start the timer
-startButton.addEventListener("click", setTime);
+startButton.addEventListener("click", startQuiz);
 
 
 // Establish questions and answers as objects in an array
@@ -81,3 +136,10 @@ var quizQuestions = [
         correctAnswer: "4"
     },
 ]
+
+// select answer 
+// 1. increment question counter
+// 2. compare selected to correct
+// 3. if correct, call quizquestions func again
+// 4. if incorrect, subtract 10 seconds timer and call quizquestions again
+// end game case
