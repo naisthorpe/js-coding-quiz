@@ -10,39 +10,37 @@ var secondsLeft = 60;
 
 var questionCounter = 0;
 
+var timerInterval;
 
 // Timer functionality
 function setTime() {
     
-    var timerInterval = setInterval(function() {
-        
+    timerInterval = setInterval(function() {        
         secondsLeft--;
-
         timeLeft.textContent = secondsLeft;
 
         // Stop timer when reach zero
         if (secondsLeft <= 0) {
             clearInterval(timerInterval);
-            timeLeft.textContent = 0;
-        }
+        } 
     }, 1000);
     
 };
 
-// function to generate HTML for the questions
-function quizQs(questionObject) {
+var answers;
 
-    console.log(questionObject);
+// function to generate HTML for the questions
+function generateQuestions(questionObject) {
+
+    // console.log(questionObject);
 
     var question = document.createElement("h1");
-
     question.textContent = questionObject.question;
-
     content.appendChild(question);
 
-    var answers = Object.entries(questionObject.answers);
+    answers = Object.entries(questionObject.answers);
 
-    console.log(answers);
+    // console.log(answers);
 
     for (var i=0; i < answers.length; i++) {
         var answer = answers[i];
@@ -55,27 +53,128 @@ function quizQs(questionObject) {
             answerSelect(event, questionObject.correctAnswer)
         });
         content.appendChild(button);
-    }
+    };
 
 }
 
 // what happens when user selects an answer
 function answerSelect(event, correctAnswer) {
-    console.log(event.target.value);
-    console.log(correctAnswer);
+
+    var chosenAnswer = event.target.value;
+
+    if (chosenAnswer === correctAnswer) {
+        console.log(true)
+        var correct = document.createElement("p");
+        correct.setAttribute("class", "right-wrong-text");
+        correct.textContent = "Correct answer!";
+        content.appendChild(correct);
+        questionCounter++;
+        content.innerHTML = "";
+        if (questionCounter <= answers.length) {
+            generateQuestions(quizQuestions[questionCounter]);
+        } else {
+            endGame();
+        }
+    } else {
+        secondsLeft -= 10;
+        questionCounter++;
+        var wrong = document.createElement("p");
+        wrong.setAttribute("class", "right-wrong-text");
+        wrong.textContent = "Wrong answer!";
+        content.appendChild(wrong);
+        console.log(false);
+        content.innerHTML = "";
+        if (questionCounter <= answers.length) {
+            generateQuestions(quizQuestions[questionCounter]);
+        } else {
+            endGame();
+        }
+        
+    }
+
+}
+
+function endGame() {
+    clearInterval(timerInterval);
+    var score = secondsLeft;
+    // score.setAttribute("id", "lastScore");
+    // console.log(score);
+    content.innerHTML = "";
+
+    var gameOverText = document.createElement("h2");
+    gameOverText.textContent = "GAME OVER";
+    content.appendChild(gameOverText);
+
+    var yourScore = document.createElement("p");
+    yourScore.textContent = "Final Score: " + score;
+    localStorage.setItem("lastScore", score);
+    content.appendChild(yourScore);
+
+    initialEnter();
+
+}
+
+var nameSubmit;
+
+function initialEnter() {
+
+    // create form to hold initials stuff
+    var initialsForm = document.createElement("form");
+    // initialsForm.append(enterText);
+    // initialsForm.append(highScoreName);
+    // initialsForm.append(nameSubmit);
+
+
+    // create text before initials box
+    var enterText = document.createElement("label");
+    enterText.textContent = "Enter Initials: "
+    content.appendChild(enterText);
+
+    // create input for initials
+    var highScoreName = document.createElement("input");
+    highScoreName.setAttribute("id", "initials");
+    // highScoreName.textContent = "Enter Initials: ";
+    // localStorage.setItem("lastInitials", highScoreName);
+    content.appendChild(highScoreName);
+
+    // create button to submit 
+    nameSubmit = document.createElement("button");
+    nameSubmit.textContent = "Submit";
+    nameSubmit.setAttribute("id", "initials-submit");
+    content.appendChild(nameSubmit);
+
+    content.appendChild(initialsForm);
+
+    var initialsInputEl = document.getElementById("initials");
+
+    initialsInputEl.addEventListener("submit", handleInitialSubmit);
+
+    function renderHighScore() {
+        var lastScore = localStorage.getItem("lastScore");
+        var lastInitials = localStorage.getItem("lastInitials");
+    }
+
+}
+
+function handleInitialSubmit(event) {
+
+    event.preventDefault();
+
+    console.log(nameSubmit);
 }
 
 
-function startQuiz() {
 
+
+
+// initialsInputEl.addEventListener("submit", handleInitialSubmit);
+
+function startQuiz() {
     setTime();
 
-    console.log(content);
-
+    // console.log(content);
     content.innerHTML = "";
-
-    quizQs(quizQuestions[questionCounter]);
-
+    generateQuestions(quizQuestions[questionCounter]);
 }
 
 // When start clicked, start the timer
