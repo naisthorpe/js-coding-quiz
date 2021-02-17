@@ -116,53 +116,69 @@ function endGame() {
 
 var nameSubmit;
 
+var highScoreName;
+
+/*
+
+*/
+
+
+
 function initialEnter() {
 
     // create form to hold initials stuff
     var initialsForm = document.createElement("form");
+    initialsForm.setAttribute("class", "initials-form");
     // initialsForm.append(enterText);
     // initialsForm.append(highScoreName);
     // initialsForm.append(nameSubmit);
+    content.appendChild(initialsForm);
 
 
     // create text before initials box
     var enterText = document.createElement("label");
     enterText.textContent = "Enter Initials: "
-    content.appendChild(enterText);
+    initialsForm.appendChild(enterText);
 
     // create input for initials
-    var highScoreName = document.createElement("input");
-    highScoreName.setAttribute("id", "initials");
+    highScoreName = document.createElement("input");
+    highScoreName.setAttribute("id", "highScoreName");
     // highScoreName.textContent = "Enter Initials: ";
-    // localStorage.setItem("lastInitials", highScoreName);
-    content.appendChild(highScoreName);
+    
+    initialsForm.appendChild(highScoreName);
 
     // create button to submit 
     nameSubmit = document.createElement("button");
     nameSubmit.textContent = "Submit";
     nameSubmit.setAttribute("id", "initials-submit");
-    content.appendChild(nameSubmit);
+    initialsForm.appendChild(nameSubmit);
 
     content.appendChild(initialsForm);
 
-    var initialsInputEl = document.getElementById("initials");
+    var initialsInputEl = document.querySelector(".initials-form");
 
     initialsInputEl.addEventListener("submit", handleInitialSubmit);
 
-    function renderHighScore() {
-        var lastScore = localStorage.getItem("lastScore");
-        var lastInitials = localStorage.getItem("lastInitials");
-    }
+    // function renderHighScore() {
+    //     var lastScore = localStorage.getItem("lastScore");
+    //     var lastInitials = localStorage.getItem("lastInitials");
+
+        
+    // }
 
 }
+
 
 function handleInitialSubmit(event) {
 
     event.preventDefault();
 
-    console.log(nameSubmit);
+    localStorage.setItem("lastInitials", highScoreName.value);
+
 }
 
+
+function 
 
 
 
