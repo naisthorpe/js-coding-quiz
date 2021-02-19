@@ -1,9 +1,11 @@
 // Timer setup
-var startButton = document.querySelector("#start-button");
+var startButton = document.getElementById("start-button");
 
-var timeLeft = document.querySelector("#timer-count");
+var timeLeft = document.getElementById("timer-count");
 
 var content = document.getElementById("content");
+
+var scorePage = document.getElementById("score-page");
 
 // Starting time for quiz
 var secondsLeft = 60;
@@ -25,7 +27,7 @@ function setTime() {
         } 
     }, 1000);
     
-};
+}
 
 var answers;
 
@@ -94,6 +96,9 @@ function answerSelect(event, correctAnswer) {
 
 }
 
+var listOfScores = [];
+var listOfInitials = [];
+
 function endGame() {
     clearInterval(timerInterval);
     var score = secondsLeft;
@@ -107,22 +112,17 @@ function endGame() {
 
     var yourScore = document.createElement("p");
     yourScore.textContent = "Final Score: " + score;
-    localStorage.setItem("lastScore", score);
+    listOfScores.push(score);
+    localStorage.setItem("lastScore", JSON.stringify(score));
     content.appendChild(yourScore);
 
     initialEnter();
 
 }
 
-var nameSubmit;
+var lastScore;
 
 var highScoreName;
-
-/*
-
-*/
-
-
 
 function initialEnter() {
 
@@ -148,40 +148,67 @@ function initialEnter() {
     initialsForm.appendChild(highScoreName);
 
     // create button to submit 
-    nameSubmit = document.createElement("button");
+    var nameSubmit = document.createElement("button");
     nameSubmit.textContent = "Submit";
     nameSubmit.setAttribute("id", "initials-submit");
     initialsForm.appendChild(nameSubmit);
 
     content.appendChild(initialsForm);
 
+    listOfInitials.push(highScoreName.value);
+
     var initialsInputEl = document.querySelector(".initials-form");
 
     initialsInputEl.addEventListener("submit", handleInitialSubmit);
 
-    // function renderHighScore() {
-    //     var lastScore = localStorage.getItem("lastScore");
-    //     var lastInitials = localStorage.getItem("lastInitials");
-
-        
-    // }
-
 }
 
+
+
+var lastScore = localStorage.getItem("lastScore");
+var lastInitials = localStorage.getItem("lastInitials");
+
+var scoresObject = {};
+
+if (scoresObject == null) {
+    s
+}
 
 function handleInitialSubmit(event) {
 
     event.preventDefault();
 
-    localStorage.setItem("lastInitials", highScoreName.value);
+    localStorage.setItem("lastInitials", JSON.stringify(listOfInitials));
+    
+    
+    // open next html page with high scores list
+    document.location.href = "scores.html";
 
 }
+    
+function renderScores() {
+    console.log("hit");
+}
 
+if (scorePage) {
+    scorePage.innerHTML = "";
+    // add score: initials to scoresObject
+    scoresObject[lastScore] = lastInitials;
+    localStorage.setItem("test", JSON.stringify(scoresObject));
 
-function 
+    var scoreListSize = Object.keys(scoresObject).length;
 
+    console.log(scoreListSize);
 
+    console.log(scoresObject);
 
+    // var scoreItem = document.createElement("li");
+
+    // scoreItem.textContent = (lastInitials + ' ' + lastScore);
+
+    // scorePage.appendChild(scoreItem);
+    
+}
 
 // initialsInputEl.addEventListener("submit", handleInitialSubmit);
 
@@ -193,8 +220,18 @@ function startQuiz() {
     generateQuestions(quizQuestions[questionCounter]);
 }
 
-// When start clicked, start the timer
-startButton.addEventListener("click", startQuiz);
+// When start clicked, start the quiz game (start timer and load questions)
+if (startButton) {
+    startButton.addEventListener("click", startQuiz);
+}
+
+var storedScores = [];
+var storedInitials = [];
+
+function init() {
+    storedScores.push(lastScore);
+    storedInitials.push(lastInitials);
+}
 
 
 // Establish questions and answers as objects in an array

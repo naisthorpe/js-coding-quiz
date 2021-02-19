@@ -50,3 +50,10 @@ button {
 .start-button:hover {
     background-color: rgb(19, 19, 124);
 }
+
+.high-score-title {
+    justify-content: center;
+    font-weight: bold;
+    margin-top: 50px;
+}
+
