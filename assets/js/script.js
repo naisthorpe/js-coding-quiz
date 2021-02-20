@@ -96,12 +96,13 @@ function answerSelect(event, correctAnswer) {
 
 }
 
-var listOfScores = [];
-var listOfInitials = [];
+var listOfScores = new Object();
+
+var score;
 
 function endGame() {
     clearInterval(timerInterval);
-    var score = secondsLeft;
+    score = secondsLeft;
     // score.setAttribute("id", "lastScore");
     // console.log(score);
     content.innerHTML = "";
@@ -110,29 +111,28 @@ function endGame() {
     gameOverText.textContent = "GAME OVER";
     content.appendChild(gameOverText);
 
-    var yourScore = document.createElement("p");
-    yourScore.textContent = "Final Score: " + score;
-    listOfScores.push(score);
-    localStorage.setItem("lastScore", JSON.stringify(score));
-    content.appendChild(yourScore);
+    var yourScoreText = document.createElement("p");
+    yourScoreText.textContent = "Final Score: " + score;    
+    content.appendChild(yourScoreText);
 
     initialEnter();
 
 }
 
+
+
 var lastScore;
 
-var highScoreName;
+var nameInput;
+
+var rawInitials;
 
 function initialEnter() {
 
     // create form to hold initials stuff
     var initialsForm = document.createElement("form");
     initialsForm.setAttribute("class", "initials-form");
-    // initialsForm.append(enterText);
-    // initialsForm.append(highScoreName);
-    // initialsForm.append(nameSubmit);
-    content.appendChild(initialsForm);
+    // content.appendChild(initialsForm);
 
 
     // create text before initials box
@@ -141,21 +141,19 @@ function initialEnter() {
     initialsForm.appendChild(enterText);
 
     // create input for initials
-    highScoreName = document.createElement("input");
-    highScoreName.setAttribute("id", "highScoreName");
-    // highScoreName.textContent = "Enter Initials: ";
-    
-    initialsForm.appendChild(highScoreName);
+    nameInput = document.createElement("input");
+    nameInput.setAttribute("id", "name-input");
+    nameInput.textContent = "Enter Initials: ";
+    initialsForm.appendChild(nameInput);
 
     // create button to submit 
-    var nameSubmit = document.createElement("button");
-    nameSubmit.textContent = "Submit";
-    nameSubmit.setAttribute("id", "initials-submit");
-    initialsForm.appendChild(nameSubmit);
-
+    var nameSubmitBtn = document.createElement("button");
+    nameSubmitBtn.textContent = "Submit";
+    nameSubmitBtn.setAttribute("id", "initials-submit");
+    initialsForm.appendChild(nameSubmitBtn);
     content.appendChild(initialsForm);
 
-    listOfInitials.push(highScoreName.value);
+    
 
     var initialsInputEl = document.querySelector(".initials-form");
 
@@ -164,58 +162,68 @@ function initialEnter() {
 }
 
 
+if (scorePage) {
 
-var lastScore = localStorage.getItem("lastScore");
-var lastInitials = localStorage.getItem("lastInitials");
-
-var scoresObject = {};
-
-if (scoresObject == null) {
-    s
+    var plsWork = JSON.parse(localStorage.getItem("hit"));
+    console.log(plsWork);
 }
+
+function storeData () {
+
+    console.log("hit");
+
+    // localStorage.setItem("scores", JSON.stringify(listOfScores));
+}
+
 
 function handleInitialSubmit(event) {
 
     event.preventDefault();
+    
+    rawInitials = document.getElementById("name-input").value;
 
-    localStorage.setItem("lastInitials", JSON.stringify(listOfInitials));
+    listOfScores[rawInitials] = score;
+
+    localStorage.setItem("hit", JSON.stringify(listOfScores));
     
-    
+
     // open next html page with high scores list
-    document.location.href = "scores.html";
+    document.location.href = ("scores.html");
+
 
 }
+
+function init() {
+    var storedScores = JSON.parse(localStorage.getItem("lastScore"));
+    var storedInitials = JSON.parse(localStorage.getItem("lastInitials"))
+
+    if (storedScores !==null) {
+        listOfScores = storedScores;
+    }
     
-function renderScores() {
-    console.log("hit");
+    if (storedInitials !== null) {
+        listOfInitials = storedInitials;
+    }
+
+    if (scorePage) {
+        renderScoreList();
+    }
 }
 
-if (scorePage) {
-    scorePage.innerHTML = "";
-    // add score: initials to scoresObject
-    scoresObject[lastScore] = lastInitials;
-    localStorage.setItem("test", JSON.stringify(scoresObject));
+function renderScoreList() {
 
-    var scoreListSize = Object.keys(scoresObject).length;
+    for (var i=0; i < listOfScores.length; i++) {
+        var score = listOfScores[i];
+        var initials = listOfInitials[i];
 
-    console.log(scoreListSize);
-
-    console.log(scoresObject);
-
-    // var scoreItem = document.createElement("li");
-
-    // scoreItem.textContent = (lastInitials + ' ' + lastScore);
-
-    // scorePage.appendChild(scoreItem);
-    
+        var li = document.createElement("li");
+        li.textContent = initials + ' ' + score;
+        li.setAttribute("data-index", i);
+    }
 }
-
-// initialsInputEl.addEventListener("submit", handleInitialSubmit);
 
 function startQuiz() {
     setTime();
-
-    // console.log(content);
     content.innerHTML = "";
     generateQuestions(quizQuestions[questionCounter]);
 }
@@ -225,14 +233,7 @@ if (startButton) {
     startButton.addEventListener("click", startQuiz);
 }
 
-var storedScores = [];
-var storedInitials = [];
-
-function init() {
-    storedScores.push(lastScore);
-    storedInitials.push(lastInitials);
-}
-
+init();
 
 // Establish questions and answers as objects in an array
 // the answers are another object
