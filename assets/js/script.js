@@ -96,6 +96,8 @@ function answerSelect(event, correctAnswer) {
 
 }
 
+var listOfScoreObjects = [];
+
 var listOfScores = new Object();
 
 var score;
@@ -164,27 +166,33 @@ function initialEnter() {
 
 if (scorePage) {
 
-    var plsWork = JSON.parse(localStorage.getItem("hit"));
+    var plsWork = JSON.parse(localStorage.getItem("unordered-scores"));
     console.log(plsWork);
+    storeData();
+    // sortScores();
 }
 
 function storeData () {
 
-    console.log("hit");
+    console.log(unorderedScores);
 
     // localStorage.setItem("scores", JSON.stringify(listOfScores));
 }
 
+var unorderedScores = [];
 
 function handleInitialSubmit(event) {
 
     event.preventDefault();
     
     rawInitials = document.getElementById("name-input").value;
+    
+    listOfScores[score] = rawInitials;
+    console.log(listOfScores);
 
-    listOfScores[rawInitials] = score;
+    unorderedScores.push({"score": score, "name": rawInitials,});
 
-    localStorage.setItem("hit", JSON.stringify(listOfScores));
+    localStorage.setItem("unordered-scores", JSON.stringify(unorderedScores));
     
 
     // open next html page with high scores list
@@ -194,21 +202,51 @@ function handleInitialSubmit(event) {
 }
 
 function init() {
-    var storedScores = JSON.parse(localStorage.getItem("lastScore"));
-    var storedInitials = JSON.parse(localStorage.getItem("lastInitials"))
+    var storedScores = JSON.parse(localStorage.getItem("unordered-scores"));
 
     if (storedScores !==null) {
-        listOfScores = storedScores;
-    }
-    
-    if (storedInitials !== null) {
-        listOfInitials = storedInitials;
+        unorderedScores = storedScores;
     }
 
     if (scorePage) {
-        renderScoreList();
+        console.log(unorderedScores.sort(compare).reverse());
+
+        var sortedScores = unorderedScores.sort(compare).reverse();
+
+        for (var i=0; i < sortedScores.length; i++) {
+            var scoreObject = sortedScores[i];
+            console.log(scoreObject)
+
+            var scoreFromObject = scoreObject["score"];
+            var nameFromObject = scoreObject["name"];
+
+            var li = document.createElement("li");
+            li.textContent = scoreFromObject + " " + nameFromObject;
+            li.setAttribute("data-index", i);
+            scorePage.appendChild(li);
+
+
+        }
     }
 }
+
+var sortedScores;
+
+
+//source: https://www.sitepoint.com/sort-an-array-of-objects-in-javascript/
+function compare(a,b) {
+    var comparison = 0;
+    var scoreA = a.score;
+    var scoreB = b.score;
+
+    if (scoreA > scoreB) {
+        comparison = 1;
+    } else if (scoreA < scoreB) {
+        comparison = -1;
+    }
+    return comparison;
+}
+
 
 function renderScoreList() {
 
