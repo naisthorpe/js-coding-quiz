@@ -4,16 +4,28 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <title>JS Quiz High Scores</title>
 </head>
 <body>
-    <header class="high-score-title">
-        High Scores
-    </header>
+    <nav class="navbar navbar-light bg-light d-flex justify-content-center">
+        <span class="navbar-brand h1 mb-0">High Scores</span>
+    </nav>
     <main>
-        <ol id="score-page" class="score-list"></ol>
-        <a href="index.html">Back to quiz game</a>
+        <section>
+            <ol id="score-page" class="score-list"></ol>
+        </section>
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <button id="back-btn" type="button" class="col-2 mr-5 btn btn-md btn-primary">
+                    Back to Quiz
+                </button>
+                <button id="clear-btn" type="button" class="col-2 ml-5 btn btn-md btn-secondary">
+                    Clear Scores
+                </button>
+            </div>
+        </div>
     </main>
     <script src="assets/js/script.js" type="text/JavaScript"></script>
 </body>

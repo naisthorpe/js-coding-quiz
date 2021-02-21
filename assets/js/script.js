@@ -8,7 +8,7 @@ var content = document.getElementById("content");
 var scorePage = document.getElementById("score-page");
 
 // Starting time for quiz
-var secondsLeft = 60;
+var secondsLeft = 76;
 
 var questionCounter = 0;
 
@@ -24,6 +24,7 @@ function setTime() {
         // Stop timer when reach zero
         if (secondsLeft <= 0) {
             clearInterval(timerInterval);
+            secondsLeft = 0;
         } 
     }, 1000);
     
@@ -36,7 +37,8 @@ function generateQuestions(questionObject) {
 
     // console.log(questionObject);
 
-    var question = document.createElement("h1");
+    var question = document.createElement("h3");
+    question.setAttribute("class", "question");
     question.textContent = questionObject.question;
     content.appendChild(question);
 
@@ -50,7 +52,8 @@ function generateQuestions(questionObject) {
         var button = document.createElement("button");
         button.textContent = answer[0] + ". " + answer[1];
         button.setAttribute("value", answer[0]);
-        button.setAttribute("id", "answerBtn");
+        button.setAttribute("id", "answer-btn");
+        button.setAttribute("class", "btn btn-md btn-secondary")
         button.addEventListener("click", function (event) {
             answerSelect(event, questionObject.correctAnswer)
         });
@@ -59,35 +62,39 @@ function generateQuestions(questionObject) {
 
 }
 
+var rightAnswer;
+
 // what happens when user selects an answer
 function answerSelect(event, correctAnswer) {
 
     var chosenAnswer = event.target.value;
 
     if (chosenAnswer === correctAnswer) {
-        console.log(true)
-        var correct = document.createElement("p");
-        correct.setAttribute("class", "right-wrong-text");
-        correct.textContent = "Correct answer!";
-        content.appendChild(correct);
+        rightAnswer = true;
         questionCounter++;
         content.innerHTML = "";
         if (questionCounter <= answers.length) {
             generateQuestions(quizQuestions[questionCounter]);
+            rightWrongText();
         } else {
             endGame();
         }
     } else {
-        secondsLeft -= 10;
+        if (secondsLeft >= 10){
+            secondsLeft -= 10;
+        } else if (secondsLeft < 10 || secondsLeft > 0) {
+            secondsLeft = 0;
+        } else {
+            secondsLeft = 0;
+        }
+        
         questionCounter++;
-        var wrong = document.createElement("p");
-        wrong.setAttribute("class", "right-wrong-text");
-        wrong.textContent = "Wrong answer!";
-        content.appendChild(wrong);
-        console.log(false);
+        
+        rightAnswer = false;
         content.innerHTML = "";
         if (questionCounter <= answers.length) {
             generateQuestions(quizQuestions[questionCounter]);
+            rightWrongText();
         } else {
             endGame();
         }
@@ -95,6 +102,26 @@ function answerSelect(event, correctAnswer) {
     }
 
 }
+
+function rightWrongText() {
+    var correct = document.createElement("p");
+
+    if (rightAnswer) {
+        correct.setAttribute("class", "right-wrong-text");
+        correct.textContent = "Correct answer!";
+        content.appendChild(correct);
+    } else {
+        correct.setAttribute("class", "right-wrong-text");
+        correct.textContent = "Wrong answer!";
+        content.appendChild(correct);
+    } 
+    
+    setTimeout( function () {
+        correct.setAttribute("class", "right-wrong-text hide");
+    }, 1000);
+    
+}
+
 
 var listOfScoreObjects = [];
 
@@ -105,9 +132,11 @@ var score;
 function endGame() {
     clearInterval(timerInterval);
     score = secondsLeft;
-    // score.setAttribute("id", "lastScore");
-    // console.log(score);
+    timeLeft.textContent = "";
     content.innerHTML = "";
+
+    var timerEl = document.querySelector(".timer");
+    timerEl.textContent = "";
 
     var gameOverText = document.createElement("h2");
     gameOverText.textContent = "GAME OVER";
@@ -152,6 +181,7 @@ function initialEnter() {
     var nameSubmitBtn = document.createElement("button");
     nameSubmitBtn.textContent = "Submit";
     nameSubmitBtn.setAttribute("id", "initials-submit");
+    nameSubmitBtn.setAttribute("class", "btn btn-sm btn-primary")
     initialsForm.appendChild(nameSubmitBtn);
     content.appendChild(initialsForm);
 
@@ -163,21 +193,39 @@ function initialEnter() {
 
 }
 
+var displayScores;
 
 if (scorePage) {
 
-    var plsWork = JSON.parse(localStorage.getItem("unordered-scores"));
-    console.log(plsWork);
-    storeData();
-    // sortScores();
+    displayScores = JSON.parse(localStorage.getItem("unordered-scores"));
+    // storeData();
+    
+    var backBtnEl = document.getElementById("back-btn");
+    backBtnEl.addEventListener("click", returnToQuiz);
+
+    var clearBtnEl = document.getElementById("clear-btn");
+    clearBtnEl.addEventListener("click", clearScores)
+
 }
 
-function storeData () {
+function returnToQuiz(event) {
+    event.preventDefault();
 
-    console.log(unorderedScores);
-
-    // localStorage.setItem("scores", JSON.stringify(listOfScores));
+    document.location.href = ("index.html");
 }
+
+function clearScores(event) {
+    event.preventDefault();
+    localStorage.clear();
+    scorePage.textContent="";
+}
+
+// function storeData () {
+
+//     console.log(unorderedScores);
+
+//     localStorage.setItem("scores", JSON.stringify(listOfScores));
+// }
 
 var unorderedScores = [];
 
@@ -188,7 +236,6 @@ function handleInitialSubmit(event) {
     rawInitials = document.getElementById("name-input").value;
     
     listOfScores[score] = rawInitials;
-    console.log(listOfScores);
 
     unorderedScores.push({"score": score, "name": rawInitials,});
 
@@ -209,22 +256,21 @@ function init() {
     }
 
     if (scorePage) {
-        console.log(unorderedScores.sort(compare).reverse());
+        // console.log(unorderedScores.sort(compare).reverse());
 
         var sortedScores = unorderedScores.sort(compare).reverse();
 
         for (var i=0; i < sortedScores.length; i++) {
             var scoreObject = sortedScores[i];
-            console.log(scoreObject)
+            // console.log(scoreObject)
 
             var scoreFromObject = scoreObject["score"];
             var nameFromObject = scoreObject["name"];
 
             var li = document.createElement("li");
-            li.textContent = scoreFromObject + " " + nameFromObject;
+            li.textContent = scoreFromObject + " - " + nameFromObject;
             li.setAttribute("data-index", i);
             scorePage.appendChild(li);
-
 
         }
     }
@@ -233,7 +279,7 @@ function init() {
 var sortedScores;
 
 
-//source: https://www.sitepoint.com/sort-an-array-of-objects-in-javascript/
+// source: https://www.sitepoint.com/sort-an-array-of-objects-in-javascript/
 function compare(a,b) {
     var comparison = 0;
     var scoreA = a.score;
@@ -245,19 +291,6 @@ function compare(a,b) {
         comparison = -1;
     }
     return comparison;
-}
-
-
-function renderScoreList() {
-
-    for (var i=0; i < listOfScores.length; i++) {
-        var score = listOfScores[i];
-        var initials = listOfInitials[i];
-
-        var li = document.createElement("li");
-        li.textContent = initials + ' ' + score;
-        li.setAttribute("data-index", i);
-    }
 }
 
 function startQuiz() {
